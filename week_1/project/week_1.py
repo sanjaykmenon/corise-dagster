@@ -67,4 +67,3 @@ def put_redis_data(aggregation: Aggregation): ##same as line 55
 def week_1_pipeline():
     put_redis_data(process_data(get_s3_data())) 
     # job doesn't require any inputs as it is defined in get_s3_data func.
-    pass
