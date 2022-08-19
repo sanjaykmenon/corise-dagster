@@ -5,6 +5,7 @@ from typing import List
 from dagster import In, Nothing, Out, job, op, usable_as_dagster_type
 from pydantic import BaseModel
 
+from operator import attrgetter
 
 @usable_as_dagster_type(description="Stock data")
 class Stock(BaseModel):
@@ -51,15 +52,19 @@ def get_s3_data(context):
 
 
 @op
-def process_data():
-    pass
+def process_data(stock_list: List[Stock]): #needs some sort of dummy variable stock_list
+    max_stock = max(stock_list, key=attrgetter('high'))
+    agg = Aggregation(date=max_stock.date, high=max_stock.high)
+    return agg
 
 
 @op
-def put_redis_data():
+def put_redis_data(aggregation: Aggregation): ##same as line 55
     pass
 
 
 @job
 def week_1_pipeline():
+    put_redis_data(process_data(get_s3_data())) 
+    # job doesn't require any inputs as it is defined in get_s3_data func.
     pass
